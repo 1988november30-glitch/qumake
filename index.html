@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রফেশনাল ২-কলাম প্রশ্নপত্র নির্মাতা</title>
+    <style>
+        body { font-family: 'SolaimanLipi', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .no-print { max-width: 800px; margin: 0 auto 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .input-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .input-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px; }
+        
+        /* প্রিন্ট এরিয়া ডিজাইন */
+        #exam-paper { 
+            width: 210mm; min-height: 297mm; padding: 15mm; margin: auto; 
+            background: white; border: 1px solid #ddd; box-sizing: border-box; 
+        }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { margin: 0; font-size: 22px; }
+        .header p { margin: 2px 0; font-size: 16px; font-weight: bold; }
+        .info-bar { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 15px; font-weight: bold; font-size: 14px; }
+        
+        /* ২ কলাম লেআউট */
+        #questions-container { 
+            column-count: 2; 
+            column-gap: 30px; 
+            column-rule: 1px solid #ccc; 
+        }
+        
+        .question-block { 
+            margin-bottom: 15px; 
+            break-inside: avoid; 
+        }
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 2px 10px; 
+            margin-left: 15px; 
+            margin-top: 5px; 
+            font-size: 13px;
+        }
+        
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .print-btn { background: #007bff; margin-left: 10px; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none; }
+            #exam-paper { border: none; width: 100%; padding: 0; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print">
+    <h3>পরীক্ষার তথ্য ও প্রশ্ন ইনপুট:</h3>
+    <div class="input-row">
+        <input type="text" id="schoolName" placeholder="বিদ্যালয়ের নাম" oninput="updateHeader()">
+        <input type="text" id="examName" placeholder="পরীক্ষার নাম" oninput="updateHeader()">
+    </div>
+    <div class="input-row">
+        <input type="text" id="subjectName" placeholder="বিষয়" oninput="updateHeader()">
+        <input type="text" id="totalMarks" placeholder="পূর্ণমান" oninput="updateHeader()">
+        <input type="text" id="timeLimit" placeholder="সময়" oninput="updateHeader()">
+    </div>
+
+    <hr>
+    <input type="text" id="qInput" placeholder="এখানে প্রশ্নটি লিখুন" style="width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box;">
+    <div class="input-row">
+        <input type="text" id="opt1" placeholder="অপশন (ক)">
+        <input type="text" id="opt2" placeholder="অপশন (খ)">
+        <input type="text" id="opt3" placeholder="অপশন (গ)">
+        <input type="text" id="opt4" placeholder="অপশন (ঘ)">
+    </div>
+    <button onclick="addQuestion()">প্রশ্ন যোগ করুন</button>
+    <button class="print-btn" onclick="window.print()">প্রশ্নপত্র প্রিন্ট করুন</button>
+</div>
+
+<div id="exam-paper">
+    <div class="header">
+        <h1 id="dispSchool">বিদ্যালয়ের নাম</h1>
+        <p id="dispExam">পরীক্ষার নাম</p>
+    </div>
+    <div class="info-bar">
+        <span>বিষয়: <span id="dispSub">...</span></span>
+        <span>সময়: <span id="dispTime">...</span></span>
+        <span>পূর্ণমান: <span id="dispMarks">...</span></span>
+    </div>
+    
+    <div id="questions-container">
+        </div>
+</div>
+
+<script>
+    let qCount = 1;
+    function updateHeader() {
+        document.getElementById('dispSchool').innerText = document.getElementById('schoolName').value || 'বিদ্যালয়ের নাম';
+        document.getElementById('dispExam').innerText = document.getElementById('examName').value || 'পরীক্ষার নাম';
+        document.getElementById('dispSub').innerText = document.getElementById('subjectName').value || '...';
+        document.getElementById('dispMarks').innerText = document.getElementById('totalMarks').value || '...';
+        document.getElementById('dispTime').innerText = document.getElementById('timeLimit').value || '...';
+    }
+
+    function addQuestion() {
+        const question = document.getElementById('qInput').value;
+        const o1 = document.getElementById('opt1').value;
+        const o2 = document.getElementById('opt2').value;
+        const o3 = document.getElementById('opt3').value;
+        const o4 = document.getElementById('opt4').value;
+
+        if(!question || !o1 || !o2 || !o3 || !o4) {
+            alert("সবগুলো ঘর পূরণ করুন!");
+            return;
+        }
+
+        const qHTML = `
+            <div class="question-block">
+                <strong>${qCount}. ${question}</strong>
+                <div class="options-grid">
+                    <span>(ক) ${o1}</span>
+                    <span>(খ) ${o2}</span>
+                    <span>(গ) ${o3}</span>
+                    <span>(ঘ) ${o4}</span>
+                </div>
+            </div>
+        `;
+        document.getElementById('questions-container').innerHTML += qHTML;
+        qCount++;
+        document.getElementById('qInput').value = '';
+        document.getElementById('opt1').value = '';
+        document.getElementById('opt2').value = '';
+        document.getElementById('opt3').value = '';
+        document.getElementById('opt4').value = '';
+    }
+</script>
+</body>
+</html>
